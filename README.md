@@ -130,10 +130,10 @@ Le specifiche OpenAPI vengono generate automaticamente e servite da Spring Boot.
 4. **Cliente** → `GET /api/v1/orders/{code}`  
    Recupera lo stato dell’ordine.
 
-5. **Pizzaiolo** → `POST /api/v1/orders/next`  
+5. **Pizzaiolo** → `PATCH /api/v1/orders/next`  
    Prende in carico l’ordine successivo.
 
-6. **Pizzaiolo** → `POST /api/v1/orders/complete`  
+6. **Pizzaiolo** → `PATCH /api/v1/orders/complete`  
    Completa l'ordine in lavorazione.
 
 ---
