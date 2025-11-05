@@ -33,13 +33,10 @@ Per eseguire il progetto serve:
 - **Java 17+**
 - **Maven 3.8+**
 - **Docker** (per i test di integrazione con Testcontainers)
-- **PostgreSQL** (per l’esecuzione locale)
 
 ---
 
 ## 🚀 Compilazione del progetto
-
-Clona il repository e lancia la build completa:
 
 ```bash
 cd PizzaService
@@ -146,7 +143,6 @@ Le specifiche OpenAPI vengono generate automaticamente e servite da Spring Boot.
 | **Testcontainers** | Test di integrazione reali |
 | **MockMvc** | Simulazione richieste HTTP |
 | **OpenAPI Generator** | Generazione automatica API |
-| **PostgreSQL** | Database relazionale |
 
 ---
 
