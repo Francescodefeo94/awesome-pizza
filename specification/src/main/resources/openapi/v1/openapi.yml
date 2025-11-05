@@ -1,0 +1,353 @@
+openapi: 3.0.3
+info:
+  title: Awesome Pizza API
+  version: 1.0.0
+  description: >
+    API per la gestione degli ordini e del menu della pizzeria **Awesome Pizza**.
+    Permette ai clienti di creare ordini, visualizzarli e seguirne lo stato,
+    e al pizzaiolo di gestirne l'evasione.
+
+servers:
+  - url: http://localhost:8080/api
+    description: First Version - Local development
+
+tags:
+  - name: v1/orders
+    description: Gestione degli ordini dei clienti
+  - name: v1/menu
+    description: Visualizzazione del menu delle pizze
+
+paths:
+
+  ###################################
+  #           ORDERS API
+  ###################################
+
+  /v1/orders:
+    post:
+      operationId: createOrder
+      tags: [ v1/orders ]
+      summary: Crea un nuovo ordine
+      description: Permette a un cliente di effettuare un ordine con una o più pizze dal menu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Ordine creato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+    get:
+      operationId: listOrders
+      tags: [ v1/orders ]
+      summary: Recupera la lista paginata degli ordini
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Numero pagina (inizia da 0)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Numero elementi per pagina
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            default: createdAt
+          description: Campo di ordinamento
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Direzione di ordinamento
+      responses:
+        '200':
+          description: Lista paginata di ordini
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Numero totale di elementi
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: Numero totale di pagine
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Nessun ordine trovato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/orders/{code}:
+    get:
+      operationId: getOrderByCode
+      tags: [ v1/orders ]
+      summary: Recupera un ordine tramite codice
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ordine trovato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Ordine non trovato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/orders/next:
+    patch:
+      operationId: takeNextOrder
+      tags: [ v1/orders ]
+      summary: Il pizzaiolo prende in carico l’ordine successivo in coda
+      responses:
+        '200':
+          description: Ordine preso in carico
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '409':
+          description: Nessun ordine disponibile o pizzaiolo già occupato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/orders/complete:
+    patch:
+      operationId: completeCurrentOrder
+      tags: [ v1/orders ]
+      summary: Segna l’ordine corrente come completato
+      responses:
+        '200':
+          description: Ordine completato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Nessun ordine da completare
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  ###################################
+  #           MENU API
+  ###################################
+
+  /v1/menu:
+    get:
+      operationId: getMenu
+      tags: [ v1/menu ]
+      summary: Recupera l'elenco di pizze dal menu
+      description: Restituisce la lista delle pizze disponibili, filtrabile e paginabile
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filtra per nome pizza
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+            format: double
+          description: Filtra per prezzo massimo
+        - name: keyword
+          in: query
+          schema:
+            type: string
+          description: Filtra per parola chiave nella descrizione
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Numero pagina (inizia da 0)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Numero elementi per pagina
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            default: price
+          description: Campo di ordinamento
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: asc
+          description: Direzione di ordinamento
+      responses:
+        '200':
+          description: Lista paginata di pizze
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Numero totale di elementi
+            X-Total-Pages:
+              schema:
+                type: integer
+              description: Numero totale di pagine
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PizzaResponse'
+
+components:
+  schemas:
+
+    ###################################
+    #            ORDERS
+    ###################################
+
+    CreateOrderRequest:
+      type: object
+      required: [ items ]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateOrderItemRequest'
+
+    CreateOrderItemRequest:
+      type: object
+      required: [ pizzaId, quantity ]
+      properties:
+        pizzaId:
+          type: integer
+          description: ID della pizza ordinata
+          example: 1
+        quantity:
+          type: integer
+          description: Quantità ordinata
+          minimum: 1
+        notes:
+          type: string
+          description: Note opzionali per il pizzaiolo
+          example: "Senza cipolla"
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: "CB1E1DCF"
+        status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T12:00:00Z"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+
+    OrderItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 1
+        notes:
+          type: string
+          example: "Senza cipolla"
+        pizza:
+          $ref: '#/components/schemas/PizzaResponse'
+
+    OrderStatusEnum:
+      type: string
+      enum:
+        - CREATED
+        - IN_PROGRESS
+        - COMPLETED
+
+    ###################################
+    #             MENU
+    ###################################
+
+    PizzaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Margherita"
+        description:
+          type: string
+          example: "Pomodoro, mozzarella, basilico"
+        image:
+          type: string
+          example: "/images/margherita.jpg"
+        price:
+          type: number
+          example: 7.00
+          format: double
+        notes:
+          example: "Classica e intramontabile"
+          type: string
+
+    ###################################
+    #             ERROR
+    ###################################
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string

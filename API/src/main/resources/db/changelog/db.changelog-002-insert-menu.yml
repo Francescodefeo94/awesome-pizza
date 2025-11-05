@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-insert-initial-pizzas
+      author: awesome
+      context: seed
+      changes:
+        - insert:
+            tableName: pizzas
+            columns:
+              - column: { name: name, value: "Margherita" }
+              - column: { name: description, value: "Pomodoro, mozzarella, basilico" }
+              - column: { name: image, value: "/images/margherita.jpg" }
+              - column: { name: price, valueNumeric: 7.00 }
+              - column: { name: notes, value: "Classica e intramontabile" }
+        - insert:
+            tableName: pizzas
+            columns:
+              - column: { name: name, value: "Diavola" }
+              - column: { name: description, value: "Salame piccante, mozzarella, pomodoro" }
+              - column: { name: image, value: "/images/diavola.jpg" }
+              - column: { name: price, valueNumeric: 8.50 }
+              - column: { name: notes, value: "Piccante e saporita" }
+        - insert:
+            tableName: pizzas
+            columns:
+              - column: { name: name, value: "Capricciosa" }
+              - column: { name: description, value: "Prosciutto, funghi, olive, carciofi" }
+              - column: { name: image, value: "/images/capricciosa.jpg" }
+              - column: { name: price, valueNumeric: 9.00 }
+              - column: { name: notes, value: "Ricca e gustosa" }
+        - insert:
+            tableName: pizzas
+            columns:
+              - column: { name: name, value: "Quattro Formaggi" }
+              - column: { name: description, value: "Mozzarella, gorgonzola, fontina, parmigiano" }
+              - column: { name: image, value: "/images/quattro_formaggi.jpg" }
+              - column: { name: price, valueNumeric: 9.50 }
+              - column: { name: notes, value: "Per veri amanti del formaggio" }
