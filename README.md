@@ -119,16 +119,22 @@ Le specifiche OpenAPI vengono generate automaticamente e servite da Spring Boot.
 
 ## 🧠 Flusso API
 
-1. **Cliente** → `POST /api/v1/orders`  
-   Crea un nuovo ordine.
+1. **Cliente** → `GET /api/v1/menu`  
+   Recupera il menu con la lista delle pizze.
 
-2. **Server** → genera un codice ordine e associa le pizze selezionate.
+2. **Cliente** → `POST /api/v1/orders`  
+   Crea un nuovo ordine a partire dalle pizze selezionate.
 
-3. **Cliente** → `GET /api/v1/orders/{code}`  
+3. **Server** → genera un codice ordine e associa le pizze selezionate.
+
+4. **Cliente** → `GET /api/v1/orders/{code}`  
    Recupera lo stato dell’ordine.
 
-4. **Pizzaiolo** → `POST /api/v1/orders/take`  
+5. **Pizzaiolo** → `POST /api/v1/orders/next`  
    Prende in carico l’ordine successivo.
+
+6. **Pizzaiolo** → `POST /api/v1/orders/complete`  
+   Completa l'ordine in lavorazione.
 
 ---
 
